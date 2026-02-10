@@ -1,1753 +1,380 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BossX - Crypto Exchange Platform | Validator Masternode System</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<!-- React Dependencies for Chat Room -->
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<!-- TradingView Widget -->
-<script src="https://s3.tradingview.com/tv.js"></script>
-<!-- Chart.js for Custom Flat Chart -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
-body {
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-background: #000000;
-color: #ffffff;
-overflow-x: hidden;
-}
-.gradient-bg {
-background: linear-gradient(to bottom, #1a1a1a, #000000);
-}
-.gradient-border {
-border: 1px solid rgba(245, 158, 11, 0.2);
-}
-.gradient-card {
-background: linear-gradient(to right, rgba(245, 158, 11, 0.1), rgba(234, 179, 8, 0.1));
-}
-.hover-scale {
-transition: transform 0.2s ease-in-out;
-}
-.hover-scale:hover {
-transform: scale(1.02);
-}
-.animate-pulse {
-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-0%, 100% {
-opacity: 1;
-}
-50% {
-opacity: .5;
-}
-}
-.sidebar {
-transition: width 0.3s ease-in-out;
-width: 14rem;
-min-width: 14rem;
-}
-.sidebar.collapsed {
-width: 4rem;
-min-width: 4rem;
-}
-.menu-item {
-transition: all 0.2s ease-in-out;
-}
-.menu-item:hover {
-background-color: rgba(31, 41, 55, 0.5);
-transform: translateX(4px);
-}
-.menu-item.active {
-background: linear-gradient(to right, rgba(245, 158, 11, 0.2), rgba(234, 179, 8, 0.2));
-color: #f59e0b;
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-.crypto-icon {
-width: 2.5rem;
-height: 2.5rem;
-border-radius: 0.75rem;
-display: flex;
-align-items: center;
-justify-content: center;
-font-weight: bold;
-font-size: 0.75rem;
-color: #000;
-overflow: hidden;
-}
-.crypto-icon img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-border-radius: 0.75rem;
-}
-.crypto-icon-large {
-width: 4rem;
-height: 4rem;
-border-radius: 1rem;
-display: flex;
-align-items: center;
-justify-content: center;
-background: linear-gradient(145deg, rgba(245, 158, 11, 0.1), rgba(234, 179, 8, 0.1));
-border: 1px solid rgba(245, 158, 11, 0.3);
-}
-.profile-picture {
-width: 2rem;
-height: 2rem;
-border-radius: 50%;
-overflow: hidden;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.profile-picture img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-}
-.stat-card {
-background: #1a1a1a;
-border: 1px solid #374151;
-border-radius: 0.75rem;
-padding: 1.25rem;
-transition: border-color 0.2s ease-in-out;
-position: relative;
-overflow: hidden;
-min-height: 200px;
-}
-.stat-card:hover {
-border-color: rgba(245, 158, 11, 0.5);
-}
-/* Corner Dots */
-.corner-dot {
-position: absolute;
-width: 6px;
-height: 6px;
-background: radial-gradient(circle, #22c55e, #10b981);
-border-radius: 50%;
-opacity: 0;
-transition: opacity 0.3s ease;
-box-shadow: 0 0 6px #10b981;
-pointer-events: none;
-}
-.stat-card:hover .corner-dot {
-opacity: 1;
-animation: dotPulse 2s ease-in-out infinite;
-}
-.corner-dot.top-left {
-top: -3px;
-left: -3px;
-}
-.corner-dot.top-right {
-top: -3px;
-right: -3px;
-}
-.corner-dot.bottom-right {
-bottom: -3px;
-right: -3px;
-}
-.corner-dot.bottom-left {
-bottom: -3px;
-left: -3px;
-}
-@keyframes dotPulse {
-0%, 100% {
-transform: scale(1);
-box-shadow: 0 0 6px #10b981;
-}
-50% {
-transform: scale(1.2);
-box-shadow: 0 0 12px #22c55e;
-}
-}
-/* Border Lines */
-.border-line {
-position: absolute;
-background: linear-gradient(90deg, transparent, #10b981, #22c55e, #10b981, transparent);
-opacity: 0;
-transition: opacity 0.3s ease;
-pointer-events: none;
-}
-.stat-card:hover .border-line {
-opacity: 1;
-}
-.border-top {
-top: 0;
-left: 0;
-width: 100%;
-height: 2px;
-background: linear-gradient(90deg, transparent, #10b981, #22c55e, #10b981, transparent);
-animation: borderTop 3s linear infinite;
-transform-origin: left;
-}
-.border-right {
-top: 0;
-right: 0;
-width: 2px;
-height: 100%;
-background: linear-gradient(180deg, transparent, #10b981, #22c55e, #10b981, transparent);
-animation: borderRight 3s linear infinite 0.7s;
-transform-origin: top;
-}
-.border-bottom {
-bottom: 0;
-right: 0;
-width: 100%;
-height: 2px;
-background: linear-gradient(270deg, transparent, #10b981, #22c55e, #10b981, transparent);
-animation: borderBottom 3s linear infinite 1.4s;
-transform-origin: right;
-}
-.border-left {
-bottom: 0;
-left: 0;
-width: 2px;
-height: 100%;
-background: linear-gradient(0deg, transparent, #10b981, #22c55e, #10b981, transparent);
-animation: borderLeft 3s linear infinite 2.1s;
-transform-origin: bottom;
-}
-@keyframes borderTop {
-0% {
-transform: scaleX(0);
-opacity: 0;
-}
-10% {
-opacity: 1;
-}
-25% {
-transform: scaleX(1);
-opacity: 1;
-}
-30% {
-opacity: 0;
-}
-100% {
-transform: scaleX(1);
-opacity: 0;
-}
-}
-@keyframes borderRight {
-0% {
-transform: scaleY(0);
-opacity: 0;
-}
-10% {
-opacity: 1;
-}
-25% {
-transform: scaleY(1);
-opacity: 1;
-}
-30% {
-opacity: 0;
-}
-100% {
-transform: scaleY(1);
-opacity: 0;
-}
-}
-@keyframes borderBottom {
-0% {
-transform: scaleX(0);
-opacity: 0;
-}
-10% {
-opacity: 1;
-}
-25% {
-transform: scaleX(1);
-opacity: 1;
-}
-30% {
-opacity: 0;
-}
-100% {
-transform: scaleX(1);
-opacity: 0;
-}
-}
-@keyframes borderLeft {
-0% {
-transform: scaleY(0);
-opacity: 0;
-}
-10% {
-opacity: 1;
-}
-25% {
-transform: scaleY(1);
-opacity: 1;
-}
-30% {
-opacity: 0;
-}
-100% {
-transform: scaleY(1);
-opacity: 0;
-}
-}
-/* Running Text Animation */
-#running-text {
-animation: scroll-left 60s linear infinite;
-}
-@keyframes scroll-left {
-0% {
-transform: translateX(100%);
-}
-100% {
-transform: translateX(-100%);
-}
-}
-#running-text:hover {
-animation-play-state: paused;
-}
-/* Power Button Styles */
-.power-button {
-position: relative;
-width: 60px;
-height: 60px;
-border-radius: 50%;
-border: 3px solid #374151;
-background: linear-gradient(145deg, #1f2937, #111827);
-cursor: pointer;
-transition: all 0.3s ease;
-display: flex;
-align-items: center;
-justify-content: center;
-box-shadow:
-0 8px 15px rgba(0, 0, 0, 0.3),
-inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-.power-button:hover {
-transform: translateY(-2px);
-box-shadow:
-0 12px 25px rgba(0, 0, 0, 0.4),
-inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-.power-button.on {
-border-color: #10b981;
-background: linear-gradient(145deg, #059669, #047857);
-box-shadow:
-0 8px 15px rgba(16, 185, 129, 0.3),
-inset 0 1px 0 rgba(255, 255, 255, 0.2),
-0 0 20px rgba(16, 185, 129, 0.5);
-cursor: not-allowed;
-}
-.power-button.on:hover {
-transform: none;
-box-shadow:
-0 8px 15px rgba(16, 185, 129, 0.3),
-inset 0 1px 0 rgba(255, 255, 255, 0.2),
-0 0 20px rgba(16, 185, 129, 0.5);
-}
-.power-button.off {
-border-color: #dc2626;
-background: linear-gradient(145deg, #b91c1c, #991b1b);
-box-shadow:
-0 8px 15px rgba(220, 38, 38, 0.3),
-inset 0 1px 0 rgba(255, 255, 255, 0.1),
-0 0 20px rgba(220, 38, 38, 0.5);
-}
-.power-button.off:hover {
-box-shadow:
-0 12px 25px rgba(220, 38, 38, 0.4),
-inset 0 1px 0 rgba(255, 255, 255, 0.1),
-0 0 25px rgba(220, 38, 38, 0.6);
-}
-.power-icon {
-font-size: 24px;
-color: #ffffff;
-filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-/* Copy Button Animation */
-.copy-button {
-position: relative;
-overflow: hidden;
-}
-.copy-button::before {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
-width: 100%;
-height: 100%;
-background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-transition: left 0.5s;
-}
-.copy-button:hover::before {
-left: 100%;
-}
-/* Tab Animation */
-.tab-button {
-position: relative;
-transition: all 0.3s ease;
-}
-.tab-button.active::after {
-content: '';
-position: absolute;
-bottom: -4px;
-left: 50%;
-transform: translateX(-50%);
-width: 8px;
-height: 8px;
-background: #f59e0b;
-border-radius: 50%;
-animation: pulse 2s infinite;
-}
-/* Input field styles */
-.node-input {
-width: 100%;
-padding: 0.5rem;
-background: rgba(31, 41, 55, 0.8);
-border: 1px solid #374151;
-border-radius: 0.5rem;
-color: #ffffff;
-font-size: 0.875rem;
-transition: border-color 0.2s ease;
-position: relative;
-z-index: 10;
-}
-.node-input:focus {
-outline: none;
-border-color: #f59e0b;
-box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-background: rgba(31, 41, 55, 0.9);
-}
-.node-input::placeholder {
-color: #9ca3af;
-}
-.node-input:disabled {
-background: rgba(31, 41, 55, 0.6);
-border-color: #4b5563;
-color: #9ca3af;
-cursor: not-allowed;
-}
-/* Button styles */
-.node-button {
-width: 100%;
-padding: 0.75rem;
-background: linear-gradient(145deg, #f59e0b, #d97706);
-border: none;
-border-radius: 0.5rem;
-color: #ffffff;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.2s ease;
-box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
-position: relative;
-z-index: 10;
-}
-.node-button:hover:not(:disabled) {
-background: linear-gradient(145deg, #d97706, #b45309);
-transform: translateY(-2px);
-box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
-}
-.node-button:active {
-transform: translateY(0);
-}
-.node-button:disabled {
-background: linear-gradient(145deg, #6b7280, #4b5563);
-cursor: not-allowed;
-transform: none;
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-/* Convert button specific styles */
-.convert-button {
-background: linear-gradient(145deg, #3b82f6, #2563eb) !important;
-box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3) !important;
-}
-.convert-button:hover:not(:disabled) {
-background: linear-gradient(145deg, #2563eb, #1d4ed8) !important;
-box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4) !important;
-transform: translateY(-2px);
-}
-/* Withdrawal button specific styles */
-.withdrawal-button {
-background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
-box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3) !important;
-}
-.withdrawal-button:hover:not(:disabled) {
-background: linear-gradient(145deg, #b91c1c, #991b1b) !important;
-box-shadow: 0 6px 12px rgba(220, 38, 38, 0.4) !important;
-transform: translateY(-2px);
-}
-/* Success/Error message */
-.success-message {
-position: fixed;
-top: 20px;
-right: 20px;
-background: linear-gradient(145deg, #10b981, #059669);
-color: white;
-padding: 1rem 1.5rem;
-border-radius: 0.5rem;
-box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-z-index: 1000;
-animation: slideIn 0.3s ease-out;
-}
-.error-message {
-position: fixed;
-top: 20px;
-right: 20px;
-background: linear-gradient(145deg, #dc2626, #b91c1c);
-color: white;
-padding: 1rem 1.5rem;
-border-radius: 0.5rem;
-box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-z-index: 1000;
-animation: slideIn 0.3s ease-out;
-}
-@keyframes slideIn {
-from {
-transform: translateX(100%);
-opacity: 0;
-}
-to {
-transform: translateX(0);
-opacity: 1;
-}
-}
-/* Network selection styles */
-.network-option {
-padding: 0.75rem;
-border: 1px solid #374151;
-border-radius: 0.5rem;
-background: rgba(31, 41, 55, 0.5);
-cursor: pointer;
-transition: all 0.2s ease;
-}
-.network-option:hover {
-border-color: #f59e0b;
-background: rgba(245, 158, 11, 0.1);
-}
-.network-option.selected {
-border-color: #f59e0b;
-background: rgba(245, 158, 11, 0.2);
-}
-.network-option input[type="radio"] {
-display: none;
-}
-/* Page transitions */
-.page-content {
-opacity: 0;
-transform: translateY(20px);
-transition: all 0.3s ease;
-display: none;
-}
-.page-content.active {
-opacity: 1;
-transform: translateY(0);
-display: block;
-}
-/* Responsive Grid */
-.stats-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-gap: 1rem;
-width: 100%;
-}
-@media (min-width: 1024px) {
-.stats-grid {
-grid-template-columns: repeat(4, 1fr);
-}
-}
-@media (max-width: 1023px) {
-.stats-grid {
-grid-template-columns: repeat(2, 1fr);
-}
-}
-@media (max-width: 640px) {
-.stats-grid {
-grid-template-columns: 1fr;
-}
-}
-/* Responsive sidebar */
-@media (max-width: 1440px) {
-.sidebar {
-width: 12rem;
-min-width: 12rem;
-}
-.stat-card {
-padding: 1rem;
-}
-}
-@media (max-width: 1200px) {
-.sidebar {
-width: 10rem;
-min-width: 10rem;
-}
-.profile-picture {
-width: 1.5rem;
-height: 1.5rem;
-}
-}
-.main-container {
-max-width: 100vw;
-overflow-x: hidden;
-}
-.content-container {
-max-width: 100%;
-padding: 1rem;
-}
-/* Countdown timer */
-.countdown-timer {
-font-family: 'Courier New', monospace;
-font-size: 1.1rem;
-font-weight: bold;
-color: #10b981;
-text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-}
-.auto-claim-timer {
-font-family: 'Courier New', monospace;
-font-size: 1rem;
-font-weight: bold;
-color: #3b82f6;
-text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
-}
-/* ============ CHAT ROOM STYLES ============ */
-/* Glowing Border Animation */
-@keyframes glowingBorder {
-0% { background-position: 0% 50%; }
-100% { background-position: 300% 50%; }
-}
-.glowing-border::before {
-content: '';
-position: absolute;
-top: -2px;
-left: -2px;
-right: -2px;
-bottom: -2px;
-background: linear-gradient(45deg, #f59e0b, #3b82f6, #f59e0b);
-background-size: 300% 300%;
-z-index: -1;
-border-radius: 26px;
-opacity: 0.6;
-filter: blur(1px);
-animation: glowingBorder 8s linear infinite;
-pointer-events: none;
-}
-/* Message Animation */
-@keyframes messageIn {
-from {
-opacity: 0;
-transform: translateX(-10px);
-}
-to {
-opacity: 1;
-transform: translateX(0);
-}
-}
-.message-animate {
-animation: messageIn 0.4s ease-out forwards;
-}
-/* Custom Scrollbar */
-.custom-scroll::-webkit-scrollbar {
-width: 6px;
-}
-.custom-scroll::-webkit-scrollbar-track {
-background: transparent;
-}
-.custom-scroll::-webkit-scrollbar-thumb {
-background-color: rgba(156, 163, 175, 0.5);
-border-radius: 3px;
-}
-.custom-scroll::-webkit-scrollbar-thumb:hover {
-background-color: rgba(156, 163, 175, 0.7);
-}
-/* Hover animations */
-.card-hover:hover {
-transform: scale(1.05);
-transition: all 0.3s ease;
-}
-.menu-item:hover {
-background: rgba(245, 158, 11, 0.05) !important;
-border-color: rgba(245, 158, 11, 0.5) !important;
-}
-.menu-item.active {
-background: rgba(245, 158, 11, 0.1) !important;
-border-color: #f59e0b !important;
-color: #f59e0b;
-}
-/* Live indicator */
-@keyframes blink {
-0%, 100% { opacity: 1; }
-50% { opacity: 0.5; }
-}
-.live-indicator {
-animation: blink 1.5s infinite;
-}
-.hover-glow:hover::before {
-content: '';
-position: absolute;
-top: -2px;
-left: -2px;
-right: -2px;
-bottom: -2px;
-background: linear-gradient(45deg, #f59e0b, #3b82f6, #f59e0b);
-z-index: -1;
-border-radius: 12px;
-opacity: 0.6;
-filter: blur(2px);
-animation: glowingBorder 8s linear infinite;
-}
-/* Log Colors */
-.log-entry {
-color: #10b981; /* Hijau untuk log umum */
-}
-.log-entry.auto-claim {
-color: #f59e0b; /* Emas untuk auto-claim */
-}
-/* CSS Tambahan untuk Desain Mewah, Modern, Elegant, Canggih seperti Binance */
-.exchange-bg {
-background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-box-shadow: inset 0 0 50px rgba(245, 158, 11, 0.1);
-}
-.exchange-card {
-background: linear-gradient(145deg, rgba(31, 41, 55, 0.9), rgba(17, 24, 39, 0.9));
-border: 1px solid rgba(245, 158, 11, 0.3);
-border-radius: 1rem;
-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.2);
-transition: all 0.3s ease;
-}
-.exchange-card:hover {
-box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(245, 158, 11, 0.3);
-transform: translateY(-5px);
-}
-.pair-selector {
-background: rgba(31, 41, 55, 0.8);
-border-radius: 1rem;
-padding: 1rem;
-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-.pair-button {
-background: linear-gradient(145deg, #f59e0b, #d97706);
-color: #000;
-font-weight: bold;
-padding: 0.75rem 1.5rem;
-border-radius: 0.5rem;
-transition: all 0.3s ease;
-box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-margin-bottom: 1rem;
-display: block;
-min-width: 100px;
-flex-shrink: 0;
-width: auto;
-}
-.pair-button:hover {
-background: linear-gradient(145deg, #d97706, #b45309);
-box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
-transform: scale(1.05);
-}
-.pair-button.active {
-background: linear-gradient(145deg, #10b981, #059669);
-color: #fff;
-box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-}
-.order-book th {
-background: rgba(245, 158, 11, 0.1);
-padding: 0.75rem;
-font-weight: bold;
-}
-.order-book td {
-padding: 0.5rem;
-border-bottom: 1px solid rgba(55, 65, 81, 0.5);
-}
-.buy-order {
-color: #10b981;
-}
-.sell-order {
-color: #dc2626;
-}
-.market-data {
-background: rgba(31, 41, 55, 0.8);
-border-radius: 0.75rem;
-padding: 1rem;
-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-gap: 1rem;
-}
-.trade-button.buy {
-background: linear-gradient(145deg, #10b981, #059669);
-box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-}
-.trade-button.buy:hover {
-background: linear-gradient(145deg, #059669, #047857);
-box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
-}
-.trade-button.sell {
-background: linear-gradient(145deg, #dc2626, #b91c1c);
-box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
-}
-.trade-button.sell:hover {
-background: linear-gradient(145deg, #b91c1c, #991b1b);
-box-shadow: 0 6px 12px rgba(220, 38, 38, 0.4);
-}
-.history-table th {
-background: rgba(245, 158, 11, 0.1);
-padding: 0.75rem;
-font-weight: bold;
-}
-.history-table td {
-padding: 0.5rem;
-border-bottom: 1px solid rgba(55, 65, 81, 0.5);
-}
-/* Border Lines Gold Variant */
-.border-line-gold {
-position: absolute;
-background: linear-gradient(90deg, transparent, #f59e0b, #d97706, #f59e0b, transparent);
-opacity: 0;
-transition: opacity 0.3s ease;
-pointer-events: none;
-}
-.stat-card:hover .border-line-gold,
-.log-engine:hover .border-line-gold,
-.info-system:hover .border-line-gold {
-opacity: 1;
-}
-.border-top-gold {
-top: 0;
-left: 0;
-width: 100%;
-height: 2px;
-background: linear-gradient(90deg, transparent, #f59e0b, #d97706, #f59e0b, transparent);
-animation: borderTop 3s linear infinite;
-transform-origin: left;
-}
-.border-right-gold {
-top: 0;
-right: 0;
-width: 2px;
-height: 100%;
-background: linear-gradient(180deg, transparent, #f59e0b, #d97706, #f59e0b, transparent);
-animation: borderRight 3s linear infinite 0.7s;
-transform-origin: top;
-}
-.border-bottom-gold {
-bottom: 0;
-right: 0;
-width: 100%;
-height: 2px;
-background: linear-gradient(270deg, transparent, #f59e0b, #d97706, #f59e0b, transparent);
-animation: borderBottom 3s linear infinite 1.4s;
-transform-origin: right;
-}
-.border-left-gold {
-bottom: 0;
-left: 0;
-width: 2px;
-height: 100%;
-background: linear-gradient(0deg, transparent, #f59e0b, #d97706, #f59e0b, transparent);
-animation: borderLeft 3s linear infinite 2.1s;
-transform-origin: bottom;
-}
-/* Border Lines White Variant (New for Team Developer Cards) */
-.border-line-white {
-position: absolute;
-background: linear-gradient(90deg, transparent, #ffffff, #f0f0f0, #ffffff, transparent);
-opacity: 0;
-transition: opacity 0.3s ease;
-pointer-events: none;
-}
-.exchange-card:hover .border-line-white {
-opacity: 1;
-}
-.border-top-white {
-top: 0;
-left: 0;
-width: 100%;
-height: 2px;
-background: linear-gradient(90deg, transparent, #ffffff, #f0f0f0, #ffffff, transparent);
-animation: borderTop 3s linear infinite;
-transform-origin: left;
-}
-.border-right-white {
-top: 0;
-right: 0;
-width: 2px;
-height: 100%;
-background: linear-gradient(180deg, transparent, #ffffff, #f0f0f0, #ffffff, transparent);
-animation: borderRight 3s linear infinite 0.7s;
-transform-origin: top;
-}
-.border-bottom-white {
-bottom: 0;
-right: 0;
-width: 100%;
-height: 2px;
-background: linear-gradient(270deg, transparent, #ffffff, #f0f0f0, #ffffff, transparent);
-animation: borderBottom 3s linear infinite 1.4s;
-transform-origin: right;
-}
-.border-left-white {
-bottom: 0;
-left: 0;
-width: 2px;
-height: 100%;
-background: linear-gradient(0deg, transparent, #ffffff, #f0f0f0, #ffffff, transparent);
-animation: borderLeft 3s linear infinite 2.1s;
-transform-origin: bottom;
-}
-/* Order Book Styles */
-.order-book-section {
-height: auto;
-max-height: 300px;
-overflow-y: auto;
-scrollbar-width: thin;
-}
-.order-book-item {
-display: flex;
-justify-content: space-between;
-padding: 4px 8px;
-cursor: pointer;
-transition: background 0.1s;
-}
-.order-book-item:hover {
-background: rgba(245, 158, 11, 0.05);
-transition: background 0.3s ease;
-}
-.order-book-buy {
-color: #10b981;
-}
-.order-book-sell {
-color: #dc2626;
-}
-.order-book-total {
-font-weight: bold;
-}
-/* Existing styles remain the same. Adding Binance-like enhancements */
-.order-book th {
-background: rgba(245, 158, 11, 0.1);
-padding: 0.75rem;
-font-weight: bold;
-text-align: right;
-}
-.order-book td {
-padding: 0.5rem;
-border-bottom: 1px solid rgba(55, 65, 81, 0.5);
-text-align: right;
-overflow: hidden;
-text-overflow: ellipsis;
-}
-.order-book table {
-width: 100%;
-table-layout: fixed;
-}
-.buy-order {
-color: #26a69a; /* Binance green */
-}
-.sell-order {
-color: #f45567; /* Binance red */
-}
-.depth-bar {
-position: absolute;
-left: 0;
-top: 0;
-height: 100%;
-opacity: 0.1;
-z-index: -1;
-}
-.buy-depth {
-background: #26a69a;
-}
-.sell-depth {
-background: #f45567;
-}
-.recent-trades td {
-text-align: right;
-}
-/* Adjust chart container for larger size */
-#chart-container {
-height: 100% !important;
-min-height: 400px;
-}
-#tradingview-chart {
-height: 100%;
-width: 100%;
-}
-/* Binance-like colors and fonts */
-body {
-font-family: 'Arial', sans-serif;
-}
-.market-data {
-background: #1e222d; /* Binance dark blue-gray */
-}
-.pair-button.active {
-background: #f0b90b !important; /* Binance yellow */
-color: #000 !important;
-}
-/* Additional for spread */
-#spread {
-text-align: center;
-margin: 10px 0;
-font-size: 18px;
-color: #f59e0b;
-}
-.skeleton-loading {
-animation: pulse 1.5s infinite;
-}
-@media (max-width: 768px) {
-.order-book-section {
-max-height: 200px;
-}
-.pair-button {
-padding: 0.5rem 1rem;
-}
-.market-data {
-grid-template-columns: repeat(2, 1fr);
-text-align: center;
-}
-.grid-cols-2 {
-grid-cols-1;
-}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BossX Wallet - Official TRC20 Wallet</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
 </head>
 <body>
-<div class="min-h-screen bg-black text-white flex main-container">
-<!-- Sidebar -->
-<div id="sidebar" class="sidebar h-screen gradient-bg gradient-border">
-<!-- Header with Logo -->
-<div class="p-3 border-b border-amber-500/20">
-<div class="flex items-center justify-between">
-<div class="flex items-center space-x-2">
-<div class="crypto-icon">
-<img src="https://i.ibb.co/qYBkPDH3/Picsart-25-04-01-16-25-47-054.png" alt="BossX Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\\'background: linear-gradient(145deg, #f59e0b, #d97706); color: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem;\\'>BX</div>'" />
-</div>
-<div id="logo-text">
-<h1 class="text-lg font-bold text-amber-400">BossX</h1>
-<p class="text-xs text-gray-400">Crypto Exchange</p>
-</div>
-</div>
-<button id="toggle-sidebar" class="text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 p-1 rounded">
-<i data-lucide="chevron-left"></i>
-</button>
-</div>
-</div>
-<!-- Navigation Menu -->
-<nav class="mt-4 px-2">
-<a href="#" class="menu-item active flex items-center px-2 py-2 mb-2 rounded-xl" data-page="dashboard">
-<i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Dashboard</span>
-</a>
-<!-- Menu KEY XNODE - BARU -->
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="keyxnode">
-<i data-lucide="key" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">KEY XNODE</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="deposit">
-<i data-lucide="arrow-down-circle" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Deposit</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="withdrawal">
-<i data-lucide="arrow-up-circle" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Withdrawal</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="p2p">
-<i data-lucide="users" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Peer to Peer</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="chat-room">
-<i data-lucide="message-circle" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Chat Room</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="referral">
-<i data-lucide="user-plus" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Referral</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="team-developer">
-<i data-lucide="users" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Team Developer</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="faq">
-<i data-lucide="help-circle" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">FAQ</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="settings">
-<i data-lucide="settings" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Setting</span>
-</a>
-<a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="logout">
-<i data-lucide="log-out" class="w-4 h-4"></i>
-<span class="ml-2 font-medium menu-text text-sm">Logout</span>
-</a>
-</nav>
-</div>
-<!-- Main Content -->
-<div class="flex-1 flex flex-col min-w-0">
-<!-- Header -->
-<header class="bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-amber-500/20 px-4 py-3">
-<div class="flex items-center justify-between">
-<!-- Real-time Clock -->
-<div class="flex flex-col">
-<div id="time" class="text-amber-400 text-lg font-bold">
-00:00:00
-</div>
-<div id="date" class="text-gray-400 text-sm">
-Loading...
-</div>
-</div>
-<!-- Search Bar -->
-<div class="flex-1 max-w-sm mx-4">
-<div class="relative">
-<i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
-<input
-type="text"
-placeholder="Cari cryptocurrency, transaksi..."
-class="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/20"
-/>
-</div>
-</div>
-<!-- Right Side Actions -->
-<div class="flex items-center space-x-3">
-<a href="#" class="flex items-center space-x-2 px-2 py-1 bg-green-500/10 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-colors" onclick="showPage('exchange'); event.preventDefault();">
-<i data-lucide="globe" class="w-4 h-4 text-green-400"></i>
-<span class="text-green-400 text-sm font-medium">Market Open</span>
-</a>
-<button class="relative text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 p-2 rounded">
-<i data-lucide="bell" class="w-4 h-4"></i>
-<span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-3
-</span>
-</button>
-<div class="flex items-center space-x-2 px-2 py-1 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-amber-500/50 transition-colors cursor-pointer">
-<div class="profile-picture">
-<img src="https://i.ibb.co/gbVsGLy0/FB-IMG-1617237754232.jpg" alt="Fery Muliawan" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\\'background: linear-gradient(145deg, #3b82f6, #2563eb); color: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; border-radius: 50%;\\'>FM</div>'" />
-</div>
-<div class="text-sm">
-<p class="text-white font-medium">Fery Muliawan</p>
-<p class="text-amber-400 text-xs">Validator: 8055x</p>
-</div>
-</div>
-</div>
-</div>
-</header>
-<!-- Main Content Area -->
-<main class="flex-1 overflow-auto">
-<div id="content" class="content-container space-y-4">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading BossX Wallet...</p>
+    </div>
 
-<!-- ==================== KEY XNODE PAGE ==================== -->
-<div id="keyxnode-page" class="page-content">
-<div class="p-6">
-<!-- Header -->
-<div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 border border-amber-500/20 rounded-xl p-6 mb-6">
-<div class="flex items-center justify-between">
-<div>
-<h1 class="text-3xl font-bold text-amber-400 mb-2">KEY XNODE</h1>
-<p class="text-gray-400">Aktivasi sekali seumur hidup. Reward mengalir via Validasi Running di Dashboard.</p>
-</div>
-<div class="crypto-icon-large">
-<i data-lucide="key" class="text-amber-400 w-8 h-8"></i>
-</div>
-</div>
-</div>
+    <!-- Main Container -->
+    <div id="app" class="app-container">
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">💼</span>
+                    <h1 class="logo-text">BossX <span class="logo-subtext">Wallet</span></h1>
+                </div>
+                <div class="header-actions">
+                    <button id="connectBtn" class="btn btn-outline" style="display: none;">
+                        <i class="icon">🔗</i> Connect Wallet
+                    </button>
+                    <button id="disconnectBtn" class="btn btn-outline" style="display: none;">
+                        <i class="icon">🚪</i> Disconnect
+                    </button>
+                </div>
+            </div>
+        </header>
 
-<!-- Mode: Belum Aktif -->
-<div id="xnode-inactive" class="stat-card p-6 mb-6" style="display: block;">
-<!-- Corner Dots -->
-<div class="corner-dot top-left"></div>
-<div class="corner-dot top-right"></div>
-<div class="corner-dot bottom-right"></div>
-<div class="corner-dot bottom-left"></div>
-<!-- Border Lines -->
-<div class="border-line border-top"></div>
-<div class="border-line border-right"></div>
-<div class="border-line border-bottom"></div>
-<div class="border-line border-left"></div>
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="screen active">
+            <div class="welcome-container">
+                <div class="welcome-card">
+                    <div class="welcome-icon">💼</div>
+                    <h2 class="welcome-title">Welcome to BossX Wallet</h2>
+                    <p class="welcome-subtitle">Your official wallet for BossX TRC20 tokens</p>
+                    
+                    <div class="welcome-actions">
+                        <button id="createWalletBtn" class="btn btn-primary btn-lg">
+                            <i class="icon">➕</i> Create New Wallet
+                        </button>
+                        <button id="importWalletBtn" class="btn btn-secondary btn-lg">
+                            <i class="icon">📥</i> Import Wallet
+                        </button>
+                    </div>
 
-<div class="flex items-center justify-between mb-4">
-<h3 class="text-2xl font-bold text-amber-400">Aktivasi KEY XNODE</h3>
-<span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">INACTIVE</span>
-</div>
+                    <div class="welcome-footer">
+                        <p class="welcome-note">
+                            <strong>🔒 Secure & Non-Custodial</strong><br>
+                            Your keys, your crypto. Always.
+                        </p>
+                        <div class="network-badge">
+                            <span class="network-icon">🌐</span>
+                            <span class="network-name">Tron Network (TRC20)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<div class="space-y-4 mb-6">
-<div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-<h4 class="text-amber-400 font-bold mb-2">Informasi Penting</h4>
-<ul class="text-sm text-gray-300 space-y-2">
-<li>• Harga Aktivasi: <span class="text-white font-bold">10 USDT</span></li>
-<li>• Aktivasi Hanya 1 Kali Seumur Hidup</li>
-<li>• Reward Mengalir via <span class="text-green-400 font-bold">Validasi Running</span> di Dashboard</li>
-<li>• Tidak Ada Rebuy / Renewal</li>
-<li>• 1 BossX = 1 USDT (sesuai sistem existing)</li>
-</ul>
-</div>
+        <!-- Create Wallet Screen -->
+        <div id="createWalletScreen" class="screen">
+            <div class="screen-container">
+                <div class="screen-header">
+                    <button id="backToWelcomeBtn" class="btn btn-text">
+                        <i class="icon">←</i> Back
+                    </button>
+                    <h2>Create New Wallet</h2>
+                </div>
 
-<div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-<h4 class="text-blue-400 font-bold mb-2">Cara Kerja:</h4>
-<ol class="text-sm text-gray-300 space-y-1 list-decimal pl-4">
-<li>Beli KEY XNODE dengan 10 USDT</li>
-<li>Aktivasi Node di Dashboard (minimal 10 BossX)</li>
-<li>Nyalakan Power Button untuk mulai Validasi Running</li>
-<li>Reward otomatis masuk setiap 60 detik via sistem existing</li>
-</ol>
-</div>
-</div>
+                <div class="screen-content">
+                    <div class="form-group">
+                        <label for="walletName">Wallet Name (Optional)</label>
+                        <input type="text" id="walletName" class="input-field" placeholder="My BossX Wallet">
+                    </div>
 
-<div class="space-y-3">
-<button id="activate-xnode" class="node-button">
-<i data-lucide="key" class="mr-2"></i>
-Aktivasi KEY XNODE (10 USDT)
-</button>
-<p class="text-xs text-gray-500 text-center">
-Setelah aktivasi, akses KEY XNODE Anda berlaku seumur hidup tanpa biaya tambahan
-</p>
-</div>
-</div>
+                    <div class="info-box">
+                        <div class="info-icon">🔐</div>
+                        <div class="info-content">
+                            <h4>Security Notice</h4>
+                            <p>Your 12-word recovery phrase will be generated. <strong>Write it down and store it safely.</strong> Never share it with anyone!</p>
+                        </div>
+                    </div>
 
-<!-- Mode: Sudah Aktif -->
-<div id="xnode-active" class="stat-card p-6 mb-6" style="display: none;">
-<!-- Corner Dots -->
-<div class="corner-dot top-left"></div>
-<div class="corner-dot top-right"></div>
-<div class="corner-dot bottom-right"></div>
-<div class="corner-dot bottom-left"></div>
-<!-- Border Lines -->
-<div class="border-line border-top"></div>
-<div class="border-line border-right"></div>
-<div class="border-line border-bottom"></div>
-<div class="border-line border-left"></div>
+                    <button id="generateWalletBtn" class="btn btn-primary btn-block btn-lg">
+                        <i class="icon">✨</i> Generate New Wallet
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<div class="flex items-center justify-between mb-4">
-<h3 class="text-2xl font-bold text-amber-400">KEY XNODE Status</h3>
-<span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-bold">ACTIVE LIFETIME</span>
-</div>
+        <!-- Mnemonic Display Screen -->
+        <div id="mnemonicScreen" class="screen">
+            <div class="screen-container">
+                <div class="screen-header">
+                    <h2>Backup Your Recovery Phrase</h2>
+                </div>
 
-<div class="text-center py-8">
-<div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
-<i data-lucide="check" class="w-12 h-12 text-white"></i>
-</div>
-<h4 class="text-2xl font-bold text-white mb-2">KEY XNODE Aktif Seumur Hidup</h4>
-<p class="text-gray-400 mb-4">Anda telah mengaktifkan KEY XNODE pada:</p>
-<p id="activation-date" class="text-amber-400 font-bold text-lg">24 Januari 2026, 14:30:22</p>
-</div>
+                <div class="screen-content">
+                    <div class="mnemonic-container">
+                        <div class="mnemonic-warning">
+                            <div class="warning-icon">⚠️</div>
+                            <p><strong>WARNING:</strong> This phrase gives full access to your wallet. Keep it secret and safe!</p>
+                        </div>
 
-<div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mt-6">
-<div class="flex items-start space-x-3">
-<i data-lucide="info" class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5"></i>
-<div class="text-sm text-gray-300">
-<p class="font-medium text-green-400 mb-1">Reward Mengalir di Dashboard</p>
-<p>Semua reward KEY XNODE Anda akan otomatis masuk ke sistem <span class="text-amber-400">Validasi Running</span> di halaman Dashboard.</p>
-<p class="mt-2">Cukup aktifkan Node dan nyalakan Power Button untuk mulai menerima reward harian.</p>
-</div>
-</div>
-</div>
-</div>
+                        <div id="mnemonicDisplay" class="mnemonic-display"></div>
 
-<!-- System Information -->
-<div class="bg-gray-900 border border-blue-500/20 rounded-xl p-6 mt-6 relative overflow-hidden info-system">
-<!-- Border Lines Gold -->
-<div class="border-line-gold border-top-gold"></div>
-<div class="border-line-gold border-right-gold"></div>
-<div class="border-line-gold border-bottom-gold"></div>
-<div class="border-line-gold border-left-gold"></div>
+                        <div class="mnemonic-hint">
+                            <p>📝 Write down these 12 words in order on paper and store in a secure place.</p>
+                        </div>
 
-<div class="flex items-center mb-4">
-<i data-lucide="shield" class="w-5 h-5 text-blue-400 mr-2"></i>
-<h3 class="text-lg font-semibold text-blue-400">Keamanan & Transparansi</h3>
-</div>
+                        <button id="copyMnemonicBtn" class="btn btn-secondary btn-block">
+                            <i class="icon">📋</i> Copy to Clipboard
+                        </button>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-<div>
-<p><strong>• Lifetime Access:</strong> Tidak ada expiry date setelah aktivasi</p>
-<p><strong>• No Hidden Fees:</strong> Tidak ada biaya tambahan setelah pembelian</p>
-<p><strong>• Secure:</strong> Data aktivasi tersimpan di localStorage browser Anda</p>
-</div>
-<div>
-<p><strong>• Reward System:</strong> Menggunakan mekanisme existing di Dashboard</p>
-<p><strong>• Auto-Claim:</strong> Reward masuk otomatis setiap 60 detik saat Validasi Running</p>
-<p><strong>• Convert:</strong> Reward bisa di-convert ke USDT via tombol di Dashboard</p>
-</div>
-</div>
-</div>
-</div>
-</div>
+                        <button id="confirmMnemonicBtn" class="btn btn-primary btn-block btn-lg">
+                            <i class="icon">✅</i> I Have Saved My Recovery Phrase
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<!-- Dashboard Page -->
-<div id="dashboard-page" class="page-content active">
-<!-- Running Text / Ticker -->
-<div class="bg-gray-900 border border-amber-500/20 rounded-xl p-3 overflow-hidden">
-<div class="relative">
-<div id="running-text" class="whitespace-nowrap text-amber-400 font-medium text-sm">
-🔥 BTC +5.2% $35,000 • ETH +3.8% $1,875 • BNB -1.2% $206 • ADA +7.1% $0.52 • SOL +12.5% $98 • DOT +2.3% $6.75 • MATIC +8.9% $0.89 • LINK +4.2% $14.30 • UNI +6.7% $7.25 • AVAX +9.1% $28.40 • Market Cap: $1.2T • 24h Vol: $45.6B 🚀 | BossX Validator Masternode System Active
-</div>
-</div>
-</div>
-<!-- 4 Stats Cards Horizontal -->
-<div class="stats-grid">
-<!-- Card 1: Aktivasi Node -->
-<div class="stat-card hover-scale">
-<!-- Corner Dots -->
-<div class="corner-dot top-left"></div>
-<div class="corner-dot top-right"></div>
-<div class="corner-dot bottom-right"></div>
-<div class="corner-dot bottom-left"></div>
-<!-- Border Lines -->
-<div class="border-line border-top"></div>
-<div class="border-line border-right"></div>
-<div class="border-line border-bottom"></div>
-<div class="border-line border-left"></div>
-<div class="flex items-center justify-between mb-3">
-<p class="text-sm text-gray-400">Aktivasi Node</p>
-<i data-lucide="cpu" class="w-4 h-4 text-amber-400"></i>
-</div>
-<div class="text-lg font-bold text-white mb-3">
-<span id="bossx-balance">1000 BossX</span>
-</div>
-<div class="space-y-3">
-<input
-id="activation-input"
-type="number"
-placeholder="Minimal 10 BossX"
-class="node-input"
-min="10"
-step="0.000000001"
-/>
-<button id="activation-button" class="node-button" onclick="activateNode()">
-Aktivasi Node
-</button>
-</div>
-</div>
-<!-- Card 2: Validasi Running -->
-<div class="stat-card hover-scale">
-<!-- Corner Dots -->
-<div class="corner-dot top-left"></div>
-<div class="corner-dot top-right"></div>
-<div class="corner-dot bottom-right"></div>
-<div class="corner-dot bottom-left"></div>
-<!-- Border Lines -->
-<div class="border-line border-top"></div>
-<div class="border-line border-right"></div>
-<div class="border-line border-bottom"></div>
-<div class="border-line border-left"></div>
-<div class="flex items-center justify-between mb-3">
-<p class="text-sm text-gray-400">Validasi Running</p>
-<i data-lucide="zap" class="w-4 h-4 text-green-400"></i>
-</div>
-<div class="text-lg font-bold text-white mb-3">
-<span id="validation-balance">0,000000000 BossX</span>
-</div>
-<div class="text-center space-y-3">
-<p id="validation-status" class="text-sm text-gray-400">Belum berjalan</p>
-<div id="countdown-display" class="countdown-timer" style="display: none;">
-Countdown: <span id="countdown-time">00:00:00</span>
-</div>
-<div class="flex justify-center">
-<button id="power-btn" class="power-button off" onclick="togglePower()">
-<i id="power-icon" data-lucide="power" class="power-icon"></i>
-</button>
-</div>
-<p id="power-status" class="text-xs text-gray-500" style="display: none;">
-Masternode sedang running - Auto stop jam 06:00
-</p>
-</div>
-</div>
-<!-- Card 3: Reward Validasi -->
-<div class="stat-card hover-scale">
-<!-- Corner Dots -->
-<div class="corner-dot top-left"></div>
-<div class="corner-dot top-right"></div>
-<div class="corner-dot bottom-right"></div>
-<div class="corner-dot bottom-left"></div>
-<!-- Border Lines -->
-<div class="border-line border-top"></div>
-<div class="border-line border-right"></div>
-<div class="border-line border-bottom"></div>
-<div class="border-line border-left"></div>
-<div class="flex items-center justify-between mb-3">
-<p class="text-sm text-gray-400">Reward Validasi</p>
-<i data-lucide="gift" class="w-4 h-4 text-blue-400"></i>
-</div>
-<div class="text-lg font-bold text-white mb-3">
-<span id="reward-balance">0,000000000 BossX</span>
-</div>
-<div class="space-y-3">
-<p class="text-xs text-blue-400">
-Auto claim in: <span id="auto-claim-timer" class="auto-claim-timer">--</span>s
-</p>
-<button class="node-button convert-button" onclick="convertToUSDT()">
-Convert To USDT
-</button>
-</div>
-</div>
-<!-- Card 4: Balance USDT -->
-<div class="stat-card hover-scale">
-<!-- Corner Dots -->
-<div class="corner-dot top-left"></div>
-<div class="corner-dot top-right"></div>
-<div class="corner-dot bottom-right"></div>
-<div class="corner-dot bottom-left"></div>
-<!-- Border Lines -->
-<div class="border-line border-top"></div>
-<div class="border-line border-right"></div>
-<div class="border-line border-bottom"></div>
-<div class="border-line border-left"></div>
-<div class="flex items-center justify-between mb-2">
-<p class="text-sm text-gray-400">Balance USDT</p>
-<i data-lucide="dollar-sign" class="w-4 h-4 text-green-400"></i>
-</div>
-<div class="text-2xl font-bold text-white">
-<span id="usdt-balance">1000 USDT</span>
-</div>
-<p class="text-xs text-green-400 mt-1">Available balance</p>
-</div>
-</div>
-<!-- Log Engine Masternode -->
-<div id="log-engine" class="bg-gray-900 border border-amber-500/20 rounded-xl p-4 mt-6 relative overflow-hidden log-engine">
-<!-- Border Lines Gold -->
-<div class="border-line-gold border-top-gold"></div>
-<div class="border-line-gold border-right-gold"></div>
-<div class="border-line-gold border-bottom-gold"></div>
-<div class="border-line-gold border-left-gold"></div>
-<div class="flex justify-between items-center mb-3">
-<h3 class="text-lg font-semibold text-amber-400">Log Engine Masternode</h3>
-<button id="clear-log" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors">
-Clear Log
-</button>
-</div>
-<div id="log-output" class="bg-black p-4 rounded-lg overflow-y-auto h-64 text-sm font-mono whitespace-pre-wrap space-y-1"></div>
-</div>
-<!-- System Status Information -->
-<div class="bg-gray-900 border border-blue-500/20 rounded-xl p-4 mt-6 relative overflow-hidden info-system">
-<!-- Border Lines Gold -->
-<div class="border-line-gold border-top-gold"></div>
-<div class="border-line-gold border-right-gold"></div>
-<div class="border-line-gold border-bottom-gold"></div>
-<div class="border-line-gold border-left-gold"></div>
-<div class="flex items-center mb-3">
-<i data-lucide="info" class="w-5 h-5 text-blue-400 mr-2"></i>
-<h3 class="text-lg font-semibold text-blue-400">Informasi Sistem BossX Validator</h3>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-<div>
-<p><strong>• Node Status:</strong> <span id="node-status">Belum Aktif</span></p>
-<p><strong>• Auto Stop:</strong> Setiap hari jam 06:00</p>
-<p><strong>• Auto Claim:</strong> Hanya saat validasi running</p>
-<p><strong>• Masa Berlaku Validasi:</strong> <span id="masa-berlaku">40.000.000 detik</span></p>
-</div>
-<div>
-<p><strong>• Minimal Aktivasi:</strong> 10 BossX</p>
-<p><strong>• Minimal Convert:</strong> 1 BossX</p>
-<p><strong>• Rate Convert:</strong> 1 BossX = 1 USDT</p>
-</div>
-</div>
-</div>
-</div>
+        <!-- Import Wallet Screen -->
+        <div id="importWalletScreen" class="screen">
+            <div class="screen-container">
+                <div class="screen-header">
+                    <button id="backToWelcomeFromImportBtn" class="btn btn-text">
+                        <i class="icon">←</i> Back
+                    </button>
+                    <h2>Import Wallet</h2>
+                </div>
 
-<!-- [SISA HALAMAN LAINNYA TETAP SAMA - DEPOSIT, WITHDRAWAL, P2P, CHAT ROOM, REFERRAL, DLL] -->
+                <div class="screen-content">
+                    <div class="import-options">
+                        <button id="importMnemonicBtn" class="import-option active">
+                            <div class="import-icon">🗝️</div>
+                            <div class="import-text">
+                                <h4>Recovery Phrase</h4>
+                                <p>12 or 24 words</p>
+                            </div>
+                        </button>
 
-<!-- Deposit Page -->
-<div id="deposit-page" class="page-content">
-<!-- Header -->
-<div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 border border-amber-500/20 rounded-xl p-6 mb-6">
-<div class="flex items-center justify-between">
-<div>
-<h1 class="text-3xl font-bold text-amber-400 mb-2">Deposit Crypto</h1>
-<p class="text-gray-400">Deposit USDT dan BOSSX ke wallet Anda dengan mudah dan aman</p>
-</div>
-<div class="crypto-icon-large">
-<i data-lucide="wallet" class="text-amber-400 w-8 h-8"></i>
-</div>
-</div>
-</div>
-<!-- ... isi halaman deposit tetap sama seperti file asli ... -->
-</div>
+                        <button id="importPrivateKeyBtn" class="import-option">
+                            <div class="import-icon">🔑</div>
+                            <div class="import-text">
+                                <h4>Private Key</h4>
+                                <p>Hexadecimal string</p>
+                            </div>
+                        </button>
+                    </div>
 
-<!-- Withdrawal Page -->
-<div id="withdrawal-page" class="page-content">
-<!-- ... isi halaman withdrawal tetap sama seperti file asli ... -->
-</div>
+                    <div id="mnemonicImportForm" class="import-form">
+                        <div class="form-group">
+                            <label for="mnemonicInput">Enter your 12-word recovery phrase</label>
+                            <textarea id="mnemonicInput" class="input-field" rows="3" placeholder="word1 word2 word3 ... word12"></textarea>
+                        </div>
 
-<!-- P2P Page -->
-<div id="p2p-page" class="page-content">
-<!-- ... isi halaman P2P tetap sama seperti file asli ... -->
-</div>
+                        <button id="importFromMnemonicBtn" class="btn btn-primary btn-block btn-lg">
+                            <i class="icon">📥</i> Import Wallet
+                        </button>
+                    </div>
 
-<!-- Chat Room Page -->
-<div id="chat-room-page" class="page-content">
-<div id="chat-room-container" class="w-full h-full"></div>
-</div>
+                    <div id="privateKeyImportForm" class="import-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="privateKeyInput">Enter your private key</label>
+                            <input type="password" id="privateKeyInput" class="input-field" placeholder="Your private key...">
+                            <button type="button" id="togglePrivateKeyVisibility" class="input-toggle">👁️</button>
+                        </div>
 
-<!-- Referral Page -->
-<div id="referral-page" class="page-content">
-<!-- ... isi halaman referral tetap sama seperti file asli ... -->
-</div>
+                        <button id="importFromPrivateKeyBtn" class="btn btn-primary btn-block btn-lg">
+                            <i class="icon">📥</i> Import Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<!-- Team Developer Page -->
-<div id="team-developer-page" class="page-content">
-<!-- ... isi halaman team developer tetap sama seperti file asli ... -->
-</div>
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="screen">
+            <div class="screen-container">
+                <div class="screen-header">
+                    <div class="header-left">
+                        <button id="menuBtn" class="btn btn-icon">
+                            <i class="icon">☰</i>
+                        </button>
+                        <h2>Dashboard</h2>
+                    </div>
+                    <div class="header-right">
+                        <button id="refreshBalanceBtn" class="btn btn-icon" title="Refresh">
+                            <i class="icon">🔄</i>
+                        </button>
+                    </div>
+                </div>
 
-<!-- FAQ Page -->
-<div id="faq-page" class="page-content">
-<div class="p-6">
-<h1 class="text-2xl font-bold text-amber-400 mb-4">FAQ</h1>
-<p class="text-gray-400">Fitur FAQ akan segera hadir...</p>
-</div>
-</div>
+                <div class="screen-content">
+                    <!-- Wallet Info Card -->
+                    <div class="card wallet-info-card">
+                        <div class="wallet-header">
+                            <h3 id="walletNameDisplay">My BossX Wallet</h3>
+                            <div class="wallet-address">
+                                <span id="walletAddressDisplay" class="address-text">Loading...</span>
+                                <button id="copyAddressBtn" class="btn btn-icon-sm" title="Copy address">
+                                    <i class="icon">📋</i>
+                                </button>
+                            </div>
+                        </div>
 
-<!-- Settings Page -->
-<div id="settings-page" class="page-content">
-<div class="p-6">
-<h1 class="text-2xl font-bold text-amber-400 mb-4">Settings</h1>
-<p class="text-gray-400">Fitur Settings akan segera hadir...</p>
-</div>
-</div>
+                        <div class="balance-container">
+                            <div class="balance-item">
+                                <div class="balance-label">
+                                    <span class="token-icon">💼</span>
+                                    <span class="token-name">BossX</span>
+                                </div>
+                                <div class="balance-value">
+                                    <span id="bossxBalance" class="balance-amount">0.00</span>
+                                    <span class="balance-usd" id="bossxBalanceUsd">~$0.00</span>
+                                </div>
+                            </div>
 
-<!-- Exchange Page -->
-<div id="exchange-page" class="page-content">
-<!-- ... isi halaman exchange tetap sama seperti file asli ... -->
-</div>
+                            <div class="balance-item">
+                                <div class="balance-label">
+                                    <span class="token-icon">TRGL</span>
+                                    <span class="token-name">TRX</span>
+                                </div>
+                                <div class="balance-value">
+                                    <span id="trxBalance" class="balance-amount">0.00</span>
+                                    <span class="balance-usd" id="trxBalanceUsd">~$0.00</span>
+                                </div>
+                            </div>
+                        </div>
 
-</div>
-</main>
-</div>
-</div>
+                        <div class="wallet-actions">
+                            <button id="receiveBtn" class="btn btn-outline btn-sm">
+                                <i class="icon">📥</i> Receive
+                            </button>
+                            <button id="sendBtn" class="btn btn-primary btn-sm">
+                                <i class="icon">📤</i> Send
+                            </button>
+                        </div>
+                    </div>
 
-<script>
-// Initialize Lucide icons
-lucide.createIcons();
+                    <!-- Quick Actions -->
+                    <div class="card quick-actions-card">
+                        <h4>Quick Actions</h4>
+                        <div class="quick-actions-grid">
+                            <button class="quick-action-btn" id="swapBtn">
+                                <div class="qa-icon">💱</div>
+                                <div class="qa-text">Swap</div>
+                            </button>
+                            <button class="quick-action-btn" id="stakeBtn">
+                                <div class="qa-icon">🔒</div>
+                                <div class="qa-text">Stake</div>
+                            </button>
+                            <button class="quick-action-btn" id="historyBtn">
+                                <div class="qa-icon">📊</div>
+                                <div class="qa-text">History</div>
+                            </button>
+                            <button class="quick-action-btn" id="settingsBtn">
+                                <div class="qa-icon">⚙️</div>
+                                <div class="qa-text">Settings</div>
+                            </button>
+                        </div>
+                    </div>
 
-// Global variables
-let currentPage = 'dashboard';
-let activeTab = 'USDT';
-let activeWithdrawalTab = 'USDT';
+                    <!-- Recent Transactions -->
+                    <div class="card" id="recentTransactionsCard">
+                        <div class="card-header">
+                            <h4>Recent Transactions</h4>
+                            <button class="btn btn-text-sm" id="viewAllTransactionsBtn">View All</button>
+                        </div>
+                        <div id="transactionsList" class="transactions-list">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <p>No transactions yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-// Dashboard variables
-let isNodeActive = false;
-let isValidationRunning = false;
-let countdownInterval;
-let validationInterval;
-let currentValidationReward = 0;
-let totalRewardBalance = 0;
-let usdtBalance = 1000;
-let bossxBalance = 1000;
-let stakedAmount = 0;
-let shareCounter = 0;
-let logInterval;
-let lastClaimTime = 0;
-let masaBerlaku = 40000000;
-let masaInterval;
+        <!-- Receive Modal -->
+        <div id="receiveModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Receive BossX</h3>
+                    <button class="btn btn-icon modal-close" data-modal="receiveModal">
+                        <i class="icon">✕</i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-container">
+                        <div id="qrCodeContainer"></div>
+                        <p class="qr-note">Scan this QR code to send BossX tokens</p>
+                    </div>
+                    <div class="address-container">
+                        <label>Your Wallet Address</label>
+                        <div class="address-box">
+                            <code id="receiveAddressDisplay" class="address-code">Loading...</code>
+                            <button id="copyReceiveAddressBtn" class="btn btn-icon-sm">
+                                <i class="icon">📋</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary btn-block modal-close" data-modal="receiveModal">
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
 
-// ========== KEY XNODE VARIABLES ==========
-let isKeyXNodeActive = localStorage.getItem('keyXNodeActive') === 'true';
-let keyXNodeActivationDate = localStorage.getItem('keyXNodeActivationDate') || null;
+        <!-- Send Modal -->
+        <div id="sendModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Send BossX</h3>
+                    <button class="btn btn-icon modal-close" data-modal="sendModal">
+                        <i class="icon">✕</i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="sendToAddress">Recipient Address</label>
+                        <input type="text" id="sendToAddress" class="input-field" placeholder="Enter TRON address">
+                    </div>
+                    <div class="form-group">
+                        <label for="sendAmount">Amount</label>
+                        <div class="amount-input-group">
+                            <input type="number" id="sendAmount" class="input-field" placeholder="0.00" step="0.01">
+                            <span class="token-badge">BossX</span>
+                            <button id="setMaxAmountBtn" class="btn btn-text-sm">Max</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sendMemo">Memo (Optional)</label>
+                        <input type="text" id="sendMemo" class="input-field" placeholder="Transaction note">
+                    </div>
+                    <div class="fee-info">
+                        <div class="fee-row">
+                            <span>Estimated Fee:</span>
+                            <span id="estimatedFee">0.1 TRX</span>
+                        </div>
+                        <div class="fee-row">
+                            <span>Total Amount:</span>
+                            <span id="totalAmount">0.00 BossX</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmSendBtn" class="btn btn-primary btn-block">
+                        <i class="icon">📤</i> Send BossX
+                    </button>
+                </div>
+            </div>
+        </div>
 
-// =============================
-// KEY XNODE FUNCTIONS
-// =============================
-function activateKeyXNode() {
-  // Validasi saldo
-  if (usdtBalance < 10) {
-    showErrorMessage('Saldo USDT tidak mencukupi! Minimal 10 USDT untuk aktivasi KEY XNODE.');
-    return;
-  }
-  
-  // Validasi sudah aktif
-  if (isKeyXNodeActive) {
-    showErrorMessage('KEY XNODE Anda sudah aktif seumur hidup! Tidak perlu aktivasi ulang.');
-    return;
-  }
-  
-  // Potong saldo
-  usdtBalance -= 10;
-  
-  // Set status aktif
-  isKeyXNodeActive = true;
-  keyXNodeActivationDate = new Date().toISOString();
-  
-  // Simpan ke localStorage
-  localStorage.setItem('keyXNodeActive', 'true');
-  localStorage.setItem('keyXNodeActivationDate', keyXNodeActivationDate);
-  
-  // Update UI
-  updateKeyXNodeDisplay();
-  updateBalanceDisplays();
-  
-  // Add log entry
-  appendLog(`[KEY XNODE] Aktivasi KEY XNODE berhasil! Biaya: 10 USDT. Akses lifetime aktif.`);
-  
-  showSuccessMessage('✅ KEY XNODE aktif seumur hidup! Reward akan mengalir via Validasi Running di Dashboard.');
-}
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast">
+            <div class="toast-icon">ℹ️</div>
+            <div class="toast-message" id="toastMessage">Notification message</div>
+        </div>
+    </div>
 
-function updateKeyXNodeDisplay() {
-  const inactiveDiv = document.getElementById('xnode-inactive');
-  const activeDiv = document.getElementById('xnode-active');
-  const activationDateEl = document.getElementById('activation-date');
-  
-  if (isKeyXNodeActive && keyXNodeActivationDate) {
-    // Format tanggal aktivasi
-    const date = new Date(keyXNodeActivationDate);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }) + ', ' + date.toLocaleTimeString('id-ID', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-    
-    activationDateEl.textContent = formattedDate;
-    
-    // Tampilkan mode active
-    inactiveDiv.style.display = 'none';
-    activeDiv.style.display = 'block';
-    
-    // Update tombol aktivasi di mode inactive (disable jika sudah aktif)
-    const activateBtn = document.getElementById('activate-xnode');
-    if (activateBtn) {
-      activateBtn.disabled = true;
-      activateBtn.innerHTML = '<i data-lucide="check" class="mr-2"></i> Sudah Aktif';
-      activateBtn.style.background = 'linear-gradient(145deg, #10b981, #059669)';
-    }
-  } else {
-    // Tampilkan mode inactive
-    inactiveDiv.style.display = 'block';
-    activeDiv.style.display = 'none';
-    
-    // Enable tombol jika belum aktif
-    const activateBtn = document.getElementById('activate-xnode');
-    if (activateBtn) {
-      activateBtn.disabled = false;
-      activateBtn.innerHTML = '<i data-lucide="key" class="mr-2"></i> Aktivasi KEY XNODE (10 USDT)';
-      activateBtn.style.background = 'linear-gradient(145deg, #f59e0b, #d97706)';
-    }
-  }
-  
-  // Re-init icons
-  lucide.createIcons();
-}
-
-// Event listener untuk tombol aktivasi
-document.addEventListener('DOMContentLoaded', function() {
-  const activateBtn = document.getElementById('activate-xnode');
-  if (activateBtn) {
-    activateBtn.addEventListener('click', activateKeyXNode);
-  }
-  
-  // Load status dari localStorage saat halaman dimuat
-  updateKeyXNodeDisplay();
-});
-
-// =============================
-// INTEGRASI DENGAN TOGGLE POWER
-// =============================
-function togglePower() {
-  if (!isNodeActive) {
-    // Cek apakah KEY XNODE sudah aktif
-    if (!isKeyXNodeActive) {
-      showErrorMessage('Aktivasi KEY XNODE terlebih dahulu di menu KEY XNODE! Minimal 10 USDT.');
-      return;
-    }
-    showErrorMessage('Aktivasi node terlebih dahulu!');
-    return;
-  }
-  
-  const powerBtn = document.getElementById('power-btn');
-  const statusText = document.getElementById('validation-status');
-  const countdownDisplay = document.getElementById('countdown-display');
-  const powerStatus = document.getElementById('power-status');
-  
-  isValidationRunning = !isValidationRunning;
-  
-  if (isValidationRunning) {
-    // Turn ON
-    powerBtn.classList.remove('off');
-    powerBtn.classList.add('on');
-    statusText.textContent = 'Stop validasi setiap jam 06.00';
-    countdownDisplay.style.display = 'block';
-    powerStatus.style.display = 'block';
-    powerStatus.style.color = '#10b981';
-    startCountdown();
-    startValidationRunning();
-    startMasaCountdown();
-    
-    // Add log entries for power on
-    appendLog('[INFO] Power On aktiv');
-    showSuccessMessage('Validasi dimulai! Auto-claim aktif setiap 60 detik.');
-  } else {
-    // Turn OFF (manual)
-    powerBtn.classList.remove('on');
-    powerBtn.classList.add('off');
-    statusText.textContent = 'Belum berjalan';
-    countdownDisplay.style.display = 'none';
-    powerStatus.style.display = 'none';
-    if (countdownInterval) {
-      clearInterval(countdownInterval);
-    }
-    stopValidationRunning();
-    if (masaInterval) clearInterval(masaInterval);
-    appendLog('[INFO] Validasi dihentikan manual');
-    showSuccessMessage('Validasi dihentikan manual.');
-  }
-  
-  lucide.createIcons();
-}
-
-// [SISA FUNGSI DASHBOARD, DEPOSIT, WITHDRAWAL, DLL TETAP SAMA SEPERTI FILE ASLI]
-
-// Page navigation
-function showPage(pageId) {
-  document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
-  const targetPage = document.getElementById(pageId + '-page');
-  if (targetPage) targetPage.classList.add('active');
-  
-  document.querySelectorAll('.menu-item').forEach(item => {
-    item.classList.remove('active');
-    item.classList.add('text-gray-400');
-  });
-  
-  const activeMenuItem = document.querySelector(`[data-page="${pageId}"]`);
-  if (activeMenuItem) {
-    activeMenuItem.classList.add('active');
-    activeMenuItem.classList.remove('text-gray-400');
-  }
-  
-  currentPage = pageId;
-  
-  if (pageId === 'deposit') updateDepositContent();
-  else if (pageId === 'withdrawal') updateWithdrawalContent();
-  else if (pageId === 'p2p') updateP2PContent();
-  else if (pageId === 'exchange') initExchangePage();
-  else if (pageId === 'chat-room') setTimeout(() => initializeChatRoom(), 100);
-  else if (pageId === 'keyxnode') {
-    updateKeyXNodeDisplay();
-  }
-  
-  if (pageId !== 'exchange' && ws) ws.close();
-}
-
-// [SISA KODE JAVASCRIPT TETAP SAMA - FUNGSI DEPOSIT, WITHDRAWAL, P2P, DLL]
-
-// Initialize
-window.addEventListener('load', function() {
-  setInterval(updateClock, 1000);
-  setInterval(checkSixAMStop, 1000);
-  updateClock();
-  updateBalanceDisplays();
-  updateDepositContent();
-  updateWithdrawalContent();
-  updateP2PContent();
-  lucide.createIcons();
-  startMasaCountdown();
-  setInterval(() => addRandomLog(), Math.floor(Math.random() * 4000) + 1000);
-  setTimeout(() => {
-    showSuccessMessage('Selamat datang di BossX Crypto Exchange Platform!');
-  }, 1000);
-});
-
-console.log('BossX Crypto Exchange Platform - Sistem Reward Per Detik berhasil dimuat!');
-</script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/tronweb@4.5.1/dist/TronWeb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
