@@ -1,380 +1,366 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BossX Wallet - Official TRC20 Wallet</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔗 Validator Social Hub</title>
+  <!-- Ethers.js untuk integrasi Web3 nanti -->
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f111a;
+      --bg-card: #1a1d2d;
+      --text-primary: #e0e6f0;
+      --text-secondary: #8b94b0;
+      --accent: #4f8cff;
+      --accent-hover: #3a6fd8;
+      --success: #22c55e;
+      --border: #2a2f45;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .logo span { color: var(--text-secondary); font-weight: 400; margin-left: 8px; }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+    }
+
+    .sidebar {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 20px;
+      height: fit-content;
+      border: 1px solid var(--border);
+    }
+
+    .avatar {
+      width: 80px; height: 80px;
+      background: #2a304a;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: var(--text-secondary);
+    }
+
+    .stat { margin: 12px 0; display: flex; justify-content: space-between; font-size: 0.9rem; }
+    .stat span:first-child { color: var(--text-secondary); }
+    .stat span:last-child { font-weight: 600; }
+
+    .feed { background: var(--bg-card); border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
+    .section-title { font-size: 1.2rem; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+    .create-post { margin-bottom: 24px; }
+    .create-post textarea {
+      width: 100%; background: #121520; border: 1px solid var(--border);
+      color: var(--text-primary); padding: 12px; border-radius: 8px;
+      resize: vertical; min-height: 80px; margin-bottom: 12px;
+    }
+    .post-options { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .file-input { display: none; }
+    .file-label {
+      background: #1e2235; padding: 8px 14px; border-radius: 8px;
+      cursor: pointer; font-size: 0.85rem; border: 1px dashed var(--border);
+    }
+    .preview-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; }
+
+    .post-card {
+      background: #151826; border-radius: 10px; padding: 16px; margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .post-author { font-weight: 600; }
+    .post-time { font-size: 0.8rem; color: var(--text-secondary); margin-left: auto; }
+    .post-content { margin: 12px 0; }
+    .post-image { width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; margin-top: 8px; }
+    .post-actions { display: flex; gap: 16px; margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary); }
+    .action-btn { cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .action-btn:hover { color: var(--accent); }
+    .action-btn.liked { color: #ff4757; }
+    
+    .comments-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: none; }
+    .comments-section.show { display: block; }
+    .comment { padding: 6px 0; font-size: 0.85rem; }
+    .comment strong { color: var(--accent); }
+    .comment-input { width: 100%; background: #0f111a; border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; }
+
+    .badge { background: #2d3748; color: #a0aec0; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 8px; }
+    .badge.update { background: #1e3a5f; color: #63b3ed; }
+    .badge.achievement { background: #322659; color: #b794f4; }
+    .badge.incident { background: #5c2020; color: #f56565; }
+
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+      .sidebar { margin-bottom: 16px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <p>Loading BossX Wallet...</p>
+
+<header>
+  <div class="logo">🔗 Validator Hub <span>Internal Network</span></div>
+  <button id="connectWallet" class="btn">🔗 Connect Wallet</button>
+</header>
+
+<div class="container">
+  <!-- SIDEBAR PROFILE -->
+  <aside class="sidebar">
+    <div class="avatar">👤</div>
+    <h3 style="text-align: center; margin-bottom: 4px;">Validator_0x1</h3>
+    <p style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">Node Operator • 99.98% Uptime</p>
+    <div class="stat"><span>Reputation</span><span id="repScore">142</span></div>
+    <div class="stat"><span>Posts</span><span id="postCount">3</span></div>
+    <div class="stat"><span>Total Likes</span><span id="totalLikes">28</span></div>
+    <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-secondary);">
+      ✅ Terverifikasi oleh Validator Registry<br>
+      🔐 Akses eksklusif jaringan
+    </p>
+  </aside>
+
+  <!-- MAIN FEED -->
+  <main class="feed">
+    <div class="create-post">
+      <textarea id="postContent" placeholder="Bagikan update node, insight, atau diskusi..."></textarea>
+      <img id="previewImg" class="preview-img" alt="Preview">
+      <div class="post-options">
+        <label class="file-label">
+          📷 Tambah Foto
+          <input type="file" id="imageInput" class="file-input" accept="image/*">
+        </label>
+        <select id="postType" style="background: #1e2235; color: white; border: 1px solid var(--border); padding: 8px; border-radius: 6px;">
+          <option value="update">📢 Update</option>
+          <option value="achievement">🏆 Achievement</option>
+          <option value="incident">⚠️ Incident</option>
+          <option value="discussion">💬 Diskusi</option>
+        </select>
+        <button id="publishBtn" class="btn">📤 Publish</button>
+      </div>
     </div>
 
-    <!-- Main Container -->
-    <div id="app" class="app-container">
-        
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <span class="logo-icon">💼</span>
-                    <h1 class="logo-text">BossX <span class="logo-subtext">Wallet</span></h1>
-                </div>
-                <div class="header-actions">
-                    <button id="connectBtn" class="btn btn-outline" style="display: none;">
-                        <i class="icon">🔗</i> Connect Wallet
-                    </button>
-                    <button id="disconnectBtn" class="btn btn-outline" style="display: none;">
-                        <i class="icon">🚪</i> Disconnect
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Welcome Screen -->
-        <div id="welcomeScreen" class="screen active">
-            <div class="welcome-container">
-                <div class="welcome-card">
-                    <div class="welcome-icon">💼</div>
-                    <h2 class="welcome-title">Welcome to BossX Wallet</h2>
-                    <p class="welcome-subtitle">Your official wallet for BossX TRC20 tokens</p>
-                    
-                    <div class="welcome-actions">
-                        <button id="createWalletBtn" class="btn btn-primary btn-lg">
-                            <i class="icon">➕</i> Create New Wallet
-                        </button>
-                        <button id="importWalletBtn" class="btn btn-secondary btn-lg">
-                            <i class="icon">📥</i> Import Wallet
-                        </button>
-                    </div>
-
-                    <div class="welcome-footer">
-                        <p class="welcome-note">
-                            <strong>🔒 Secure & Non-Custodial</strong><br>
-                            Your keys, your crypto. Always.
-                        </p>
-                        <div class="network-badge">
-                            <span class="network-icon">🌐</span>
-                            <span class="network-name">Tron Network (TRC20)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Create Wallet Screen -->
-        <div id="createWalletScreen" class="screen">
-            <div class="screen-container">
-                <div class="screen-header">
-                    <button id="backToWelcomeBtn" class="btn btn-text">
-                        <i class="icon">←</i> Back
-                    </button>
-                    <h2>Create New Wallet</h2>
-                </div>
-
-                <div class="screen-content">
-                    <div class="form-group">
-                        <label for="walletName">Wallet Name (Optional)</label>
-                        <input type="text" id="walletName" class="input-field" placeholder="My BossX Wallet">
-                    </div>
-
-                    <div class="info-box">
-                        <div class="info-icon">🔐</div>
-                        <div class="info-content">
-                            <h4>Security Notice</h4>
-                            <p>Your 12-word recovery phrase will be generated. <strong>Write it down and store it safely.</strong> Never share it with anyone!</p>
-                        </div>
-                    </div>
-
-                    <button id="generateWalletBtn" class="btn btn-primary btn-block btn-lg">
-                        <i class="icon">✨</i> Generate New Wallet
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mnemonic Display Screen -->
-        <div id="mnemonicScreen" class="screen">
-            <div class="screen-container">
-                <div class="screen-header">
-                    <h2>Backup Your Recovery Phrase</h2>
-                </div>
-
-                <div class="screen-content">
-                    <div class="mnemonic-container">
-                        <div class="mnemonic-warning">
-                            <div class="warning-icon">⚠️</div>
-                            <p><strong>WARNING:</strong> This phrase gives full access to your wallet. Keep it secret and safe!</p>
-                        </div>
-
-                        <div id="mnemonicDisplay" class="mnemonic-display"></div>
-
-                        <div class="mnemonic-hint">
-                            <p>📝 Write down these 12 words in order on paper and store in a secure place.</p>
-                        </div>
-
-                        <button id="copyMnemonicBtn" class="btn btn-secondary btn-block">
-                            <i class="icon">📋</i> Copy to Clipboard
-                        </button>
-
-                        <button id="confirmMnemonicBtn" class="btn btn-primary btn-block btn-lg">
-                            <i class="icon">✅</i> I Have Saved My Recovery Phrase
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Import Wallet Screen -->
-        <div id="importWalletScreen" class="screen">
-            <div class="screen-container">
-                <div class="screen-header">
-                    <button id="backToWelcomeFromImportBtn" class="btn btn-text">
-                        <i class="icon">←</i> Back
-                    </button>
-                    <h2>Import Wallet</h2>
-                </div>
-
-                <div class="screen-content">
-                    <div class="import-options">
-                        <button id="importMnemonicBtn" class="import-option active">
-                            <div class="import-icon">🗝️</div>
-                            <div class="import-text">
-                                <h4>Recovery Phrase</h4>
-                                <p>12 or 24 words</p>
-                            </div>
-                        </button>
-
-                        <button id="importPrivateKeyBtn" class="import-option">
-                            <div class="import-icon">🔑</div>
-                            <div class="import-text">
-                                <h4>Private Key</h4>
-                                <p>Hexadecimal string</p>
-                            </div>
-                        </button>
-                    </div>
-
-                    <div id="mnemonicImportForm" class="import-form">
-                        <div class="form-group">
-                            <label for="mnemonicInput">Enter your 12-word recovery phrase</label>
-                            <textarea id="mnemonicInput" class="input-field" rows="3" placeholder="word1 word2 word3 ... word12"></textarea>
-                        </div>
-
-                        <button id="importFromMnemonicBtn" class="btn btn-primary btn-block btn-lg">
-                            <i class="icon">📥</i> Import Wallet
-                        </button>
-                    </div>
-
-                    <div id="privateKeyImportForm" class="import-form" style="display: none;">
-                        <div class="form-group">
-                            <label for="privateKeyInput">Enter your private key</label>
-                            <input type="password" id="privateKeyInput" class="input-field" placeholder="Your private key...">
-                            <button type="button" id="togglePrivateKeyVisibility" class="input-toggle">👁️</button>
-                        </div>
-
-                        <button id="importFromPrivateKeyBtn" class="btn btn-primary btn-block btn-lg">
-                            <i class="icon">📥</i> Import Wallet
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard Screen -->
-        <div id="dashboardScreen" class="screen">
-            <div class="screen-container">
-                <div class="screen-header">
-                    <div class="header-left">
-                        <button id="menuBtn" class="btn btn-icon">
-                            <i class="icon">☰</i>
-                        </button>
-                        <h2>Dashboard</h2>
-                    </div>
-                    <div class="header-right">
-                        <button id="refreshBalanceBtn" class="btn btn-icon" title="Refresh">
-                            <i class="icon">🔄</i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="screen-content">
-                    <!-- Wallet Info Card -->
-                    <div class="card wallet-info-card">
-                        <div class="wallet-header">
-                            <h3 id="walletNameDisplay">My BossX Wallet</h3>
-                            <div class="wallet-address">
-                                <span id="walletAddressDisplay" class="address-text">Loading...</span>
-                                <button id="copyAddressBtn" class="btn btn-icon-sm" title="Copy address">
-                                    <i class="icon">📋</i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="balance-container">
-                            <div class="balance-item">
-                                <div class="balance-label">
-                                    <span class="token-icon">💼</span>
-                                    <span class="token-name">BossX</span>
-                                </div>
-                                <div class="balance-value">
-                                    <span id="bossxBalance" class="balance-amount">0.00</span>
-                                    <span class="balance-usd" id="bossxBalanceUsd">~$0.00</span>
-                                </div>
-                            </div>
-
-                            <div class="balance-item">
-                                <div class="balance-label">
-                                    <span class="token-icon">TRGL</span>
-                                    <span class="token-name">TRX</span>
-                                </div>
-                                <div class="balance-value">
-                                    <span id="trxBalance" class="balance-amount">0.00</span>
-                                    <span class="balance-usd" id="trxBalanceUsd">~$0.00</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="wallet-actions">
-                            <button id="receiveBtn" class="btn btn-outline btn-sm">
-                                <i class="icon">📥</i> Receive
-                            </button>
-                            <button id="sendBtn" class="btn btn-primary btn-sm">
-                                <i class="icon">📤</i> Send
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card quick-actions-card">
-                        <h4>Quick Actions</h4>
-                        <div class="quick-actions-grid">
-                            <button class="quick-action-btn" id="swapBtn">
-                                <div class="qa-icon">💱</div>
-                                <div class="qa-text">Swap</div>
-                            </button>
-                            <button class="quick-action-btn" id="stakeBtn">
-                                <div class="qa-icon">🔒</div>
-                                <div class="qa-text">Stake</div>
-                            </button>
-                            <button class="quick-action-btn" id="historyBtn">
-                                <div class="qa-icon">📊</div>
-                                <div class="qa-text">History</div>
-                            </button>
-                            <button class="quick-action-btn" id="settingsBtn">
-                                <div class="qa-icon">⚙️</div>
-                                <div class="qa-text">Settings</div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Recent Transactions -->
-                    <div class="card" id="recentTransactionsCard">
-                        <div class="card-header">
-                            <h4>Recent Transactions</h4>
-                            <button class="btn btn-text-sm" id="viewAllTransactionsBtn">View All</button>
-                        </div>
-                        <div id="transactionsList" class="transactions-list">
-                            <div class="empty-state">
-                                <div class="empty-icon">📭</div>
-                                <p>No transactions yet</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Receive Modal -->
-        <div id="receiveModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Receive BossX</h3>
-                    <button class="btn btn-icon modal-close" data-modal="receiveModal">
-                        <i class="icon">✕</i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="qr-container">
-                        <div id="qrCodeContainer"></div>
-                        <p class="qr-note">Scan this QR code to send BossX tokens</p>
-                    </div>
-                    <div class="address-container">
-                        <label>Your Wallet Address</label>
-                        <div class="address-box">
-                            <code id="receiveAddressDisplay" class="address-code">Loading...</code>
-                            <button id="copyReceiveAddressBtn" class="btn btn-icon-sm">
-                                <i class="icon">📋</i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary btn-block modal-close" data-modal="receiveModal">
-                        Done
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Send Modal -->
-        <div id="sendModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Send BossX</h3>
-                    <button class="btn btn-icon modal-close" data-modal="sendModal">
-                        <i class="icon">✕</i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="sendToAddress">Recipient Address</label>
-                        <input type="text" id="sendToAddress" class="input-field" placeholder="Enter TRON address">
-                    </div>
-                    <div class="form-group">
-                        <label for="sendAmount">Amount</label>
-                        <div class="amount-input-group">
-                            <input type="number" id="sendAmount" class="input-field" placeholder="0.00" step="0.01">
-                            <span class="token-badge">BossX</span>
-                            <button id="setMaxAmountBtn" class="btn btn-text-sm">Max</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="sendMemo">Memo (Optional)</label>
-                        <input type="text" id="sendMemo" class="input-field" placeholder="Transaction note">
-                    </div>
-                    <div class="fee-info">
-                        <div class="fee-row">
-                            <span>Estimated Fee:</span>
-                            <span id="estimatedFee">0.1 TRX</span>
-                        </div>
-                        <div class="fee-row">
-                            <span>Total Amount:</span>
-                            <span id="totalAmount">0.00 BossX</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="confirmSendBtn" class="btn btn-primary btn-block">
-                        <i class="icon">📤</i> Send BossX
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Toast Notification -->
-        <div id="toastNotification" class="toast">
-            <div class="toast-icon">ℹ️</div>
-            <div class="toast-message" id="toastMessage">Notification message</div>
-        </div>
+    <h3 class="section-title">📜 Feed Validator</h3>
+    <div id="postsContainer">
+      <!-- Posts akan dirender di sini oleh JS -->
     </div>
+  </main>
+</div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/tronweb@4.5.1/dist/TronWeb.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script src="app.js"></script>
+<script>
+  // === STATE LOKAL (Simulasi Database) ===
+  let currentUser = { address: null, reputation: 142, posts: 0, likes: 28 };
+  let posts = [
+    {
+      id: 1,
+      author: "Validator_0x2",
+      type: "update",
+      content: "✅ Migrasi ke consensus layer v3.1.0 selesai tanpa downtime. Metrics stabil.",
+      image: null,
+      timestamp: Date.now() - 7200000,
+      likes: 12,
+      likedByUser: false,
+      comments: [
+        { author: "Validator_0x4", text: "Nice! Pakai Lighthouse atau Prysm?" }
+      ]
+    }
+  ];
+
+  // === DOM ELEMENTS ===
+  const connectBtn = document.getElementById('connectWallet');
+  const postContent = document.getElementById('postContent');
+  const imageInput = document.getElementById('imageInput');
+  const previewImg = document.getElementById('previewImg');
+  const publishBtn = document.getElementById('publishBtn');
+  const postType = document.getElementById('postType');
+  const postsContainer = document.getElementById('postsContainer');
+  const repEl = document.getElementById('repScore');
+  const postCountEl = document.getElementById('postCount');
+  const totalLikesEl = document.getElementById('totalLikes');
+
+  // === WALLET CONNECTION (Placeholder) ===
+  connectBtn.addEventListener('click', async () => {
+    if (!window.ethereum) {
+      alert("Install MetaMask atau wallet Web3 lain!");
+      return;
+    }
+    try {
+      // Nanti diganti dengan: await window.ethereum.request({ method: 'eth_requestAccounts' });
+      currentUser.address = "0xABC...123";
+      connectBtn.textContent = "🟢 0xABC...123";
+      connectBtn.disabled = true;
+      alert("Wallet terhubung! (Mode Simulasi)");
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  // === IMAGE PREVIEW ===
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        previewImg.src = ev.target.result;
+        previewImg.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // === PUBLISH POST ===
+  publishBtn.addEventListener('click', () => {
+    const content = postContent.value.trim();
+    if (!content) return alert("Isi konten dulu!");
+
+    const newPost = {
+      id: posts.length + 1,
+      author: currentUser.address ? "Validator_You" : "Validator_0x1",
+      type: postType.value,
+      content: content,
+      image: previewImg.style.display !== 'none' ? previewImg.src : null,
+      timestamp: Date.now(),
+      likes: 0,
+      likedByUser: false,
+      comments: []
+    };
+
+    posts.unshift(newPost);
+    
+    // Reset form
+    postContent.value = '';
+    previewImg.style.display = 'none';
+    previewImg.src = '';
+    imageInput.value = '';
+
+    currentUser.posts++;
+    postCountEl.textContent = currentUser.posts;
+    renderPosts();
+
+    // 🔄 INTEGRASI SMART CONTRACT NANTI DI SINI:
+    // const tx = await contract.createPost(content, ipfsHash, postType.value);
+    // await tx.wait();
+  });
+
+  // === RENDER POSTS ===
+  function renderPosts() {
+    postsContainer.innerHTML = '';
+    posts.forEach(post => {
+      const timeAgo = getTimeAgo(post.timestamp);
+      const badgeClass = post.type;
+      const badgeText = { update: "📢 Update", achievement: "🏆 Achievement", incident: "⚠️ Incident", discussion: "💬 Diskusi" }[post.type];
+
+      const html = `
+        <div class="post-card" data-id="${post.id}">
+          <div class="post-header">
+            <span class="post-author">${post.author}</span>
+            <span class="badge ${badgeClass}">${badgeText}</span>
+            <span class="post-time">${timeAgo}</span>
+          </div>
+          <div class="post-content">${post.content}</div>
+          ${post.image ? `<img src="${post.image}" class="post-image" alt="Post media">` : ''}
+          <div class="post-actions">
+            <div class="action-btn ${post.likedByUser ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+              <span>${post.likedByUser ? '❤️' : '🤍'}</span> ${post.likes} Like
+            </div>
+            <div class="action-btn" onclick="toggleComments(${post.id})">
+              💬 ${post.comments.length} Komentar
+            </div>
+          </div>
+          <div class="comments-section" id="comments-${post.id}">
+            ${post.comments.map(c => `<div class="comment"><strong>${c.author}:</strong> ${c.text}</div>`).join('')}
+            <input type="text" class="comment-input" placeholder="Tulis komentar..." onkeydown="addComment(event, ${post.id})">
+          </div>
+        </div>
+      `;
+      postsContainer.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  // === INTERAKSI: LIKE ===
+  window.toggleLike = (id) => {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    post.likedByUser = !post.likedByUser;
+    post.likes += post.likedByUser ? 1 : -1;
+    if (post.likedByUser) currentUser.likes++;
+    else currentUser.likes--;
+    totalLikesEl.textContent = currentUser.likes;
+
+    // 🔄 INTEGRASI CONTRACT: await contract.likePost(id);
+    renderPosts();
+  };
+
+  // === INTERAKSI: COMMENTS ===
+  window.toggleComments = (id) => {
+    const el = document.getElementById(`comments-${id}`);
+    el.classList.toggle('show');
+  };
+
+  window.addComment = (e, id) => {
+    if (e.key !== 'Enter') return;
+    const input = e.target;
+    const text = input.value.trim();
+    if (!text) return;
+
+    const post = posts.find(p => p.id === id);
+    post.comments.push({ author: "Validator_You", text: text });
+    input.value = '';
+    renderPosts();
+
+    // 🔄 INTEGRASI CONTRACT: await contract.addComment(id, text);
+  };
+
+  // === UTILS ===
+  function getTimeAgo(ts) {
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Baru saja";
+    if (mins < 60) return `${mins} menit lalu`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} jam lalu`;
+    return `${Math.floor(hrs / 24)} hari lalu`;
+  }
+
+  // INIT
+  renderPosts();
+</script>
+
 </body>
 </html>
